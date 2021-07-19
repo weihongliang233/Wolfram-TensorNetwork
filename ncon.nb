@@ -1,0 +1,1487 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 12.2' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       158,          7]
+NotebookDataLength[     61528,       1479]
+NotebookOptionsPosition[     57803,       1412]
+NotebookOutlinePosition[     58252,       1430]
+CellTagsIndexPosition[     58209,       1427]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+Cell[BoxData[
+ RowBox[{"Clear", "@", "\"\<Global`*\>\""}]], "Input",
+ CellChangeTimes->{{3.8356455296145334`*^9, 3.8356455422657204`*^9}},
+ CellLabel->
+  "In[123]:=",ExpressionUUID->"9530d886-b7fe-4d69-b13c-400b994b10e6"],
+
+Cell[CellGroupData[{
+
+Cell["Defining Functions", "Subsection",
+ CellChangeTimes->{{3.835645460744306*^9, 3.8356454648444257`*^9}, {
+  3.8356461638687487`*^9, 
+  3.8356461718833313`*^9}},ExpressionUUID->"0f376cff-f8ca-4f64-aa7d-\
+05ec2f3e6d78"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"NetworkContract", "[", 
+   RowBox[{"tensorlistin_List", ",", "connectlistin_List", ",", 
+    RowBox[{"contractorderin_List", ":", 
+     RowBox[{"{", "}"}]}], ",", 
+    RowBox[{"finalorderin_List", ":", 
+     RowBox[{"{", "}"}]}], ",", 
+    RowBox[{"checknetwork_", ":", "True"}]}], "]"}], ":=", 
+  RowBox[{"Module", "[", 
+   RowBox[{
+    RowBox[{"{", 
+     RowBox[{
+     "tensorlist", ",", "connectlist", ",", "contractorder", ",", 
+      "finalorder", ",", 
+      RowBox[{"(*", 
+       RowBox[{"check", " ", "inputs", " ", "if", " ", "enabled"}], "*)"}], 
+      "flatconnect", ",", "dimensionlist", ",", 
+      RowBox[{"(*", 
+       RowBox[{"do", " ", "all", " ", "partial", " ", "traces"}], "*)"}], 
+      "completepartialtracetable", ",", "computedpartialtracetable", ",", 
+      "traceresult", ",", 
+      RowBox[{"(*", 
+       RowBox[{"do", " ", "all", " ", "binary", " ", "contractions"}], "*)"}],
+       "contractingindices", ",", "contractlocation", ",", "tensoraindices", 
+      ",", "tensorbindices", ",", "countmany", ",", "acont", ",", "bcont", 
+      ",", "af", ",", "bf", ",", 
+      RowBox[{"(*", 
+       RowBox[{"do", " ", "all", " ", "tensorproducts"}], "*)"}], 
+      "transposepara"}], "}"}], ",", "\[IndentingNewLine]", 
+    RowBox[{"(*", 
+     RowBox[{
+     "generate", " ", "contraction", " ", "order", " ", "if", " ", 
+      "necessary"}], "*)"}], "\[IndentingNewLine]", 
+    RowBox[{
+     RowBox[{"tensorlist", "=", "tensorlistin"}], ";", 
+     RowBox[{"connectlist", "=", "connectlistin"}], ";", 
+     RowBox[{"contractorder", "=", "contractorderin"}], ";", 
+     RowBox[{"finalorder", "=", "finalorderin"}], ";", "\[IndentingNewLine]", 
+     RowBox[{"flatconnect", "=", 
+      RowBox[{"Flatten", "[", "connectlist", "]"}]}], ";", 
+     "\[IndentingNewLine]", 
+     RowBox[{"If", "[", 
+      RowBox[{
+       RowBox[{"contractorder", "\[Equal]", 
+        RowBox[{"{", "}"}]}], ",", 
+       RowBox[{
+        RowBox[{"contractorder", "=", 
+         RowBox[{"Sort", "[", 
+          RowBox[{"DeleteDuplicates", "[", 
+           RowBox[{"Cases", "[", 
+            RowBox[{"flatconnect", ",", 
+             RowBox[{"_", "?", "Positive"}]}], "]"}], "]"}], "]"}]}], ";"}]}],
+       "]"}], ";", "\[IndentingNewLine]", 
+     RowBox[{"(*", 
+      RowBox[{"check", " ", "inputs", " ", "if", " ", "enabled"}], "*)"}], 
+     "\[IndentingNewLine]", 
+     RowBox[{"If", "[", 
+      RowBox[{"checknetwork", ",", 
+       RowBox[{
+        RowBox[{"dimensionlist", "=", 
+         RowBox[{"Map", "[", 
+          RowBox[{"Dimensions", ",", "tensorlist"}], "]"}]}], ";", 
+        RowBox[{"NconInputCheck", "[", 
+         RowBox[{
+         "connectlist", ",", "flatconnect", ",", "dimensionlist", ",", 
+          "contractorder"}], "]"}]}]}], "]"}], ";", "\[IndentingNewLine]", 
+     RowBox[{"(*", 
+      RowBox[{"do", " ", "all", " ", "partial", " ", "traces"}], "*)"}], 
+     "\[IndentingNewLine]", 
+     RowBox[{"completepartialtracetable", "=", 
+      RowBox[{"Partition", "[", 
+       RowBox[{
+        RowBox[{"Riffle", "[", 
+         RowBox[{"tensorlist", ",", "connectlist"}], "]"}], ",", "2"}], 
+       "]"}]}], ";", "\[IndentingNewLine]", 
+     RowBox[{"computedpartialtracetable", "=", 
+      RowBox[{"Map", "[", 
+       RowBox[{
+        RowBox[{
+         RowBox[{"TensorPartialTrace", "@@", "#"}], "&"}], ",", 
+        "completepartialtracetable"}], "]"}]}], ";", "\[IndentingNewLine]", 
+     RowBox[{"traceresult", "=", 
+      RowBox[{"Transpose", "[", 
+       RowBox[{"computedpartialtracetable", ",", 
+        RowBox[{"{", 
+         RowBox[{"2", ",", "1"}], "}"}]}], "]"}]}], ";", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{"tensorlist", ",", "connectlist"}], "}"}], "=", 
+      RowBox[{"Part", "[", 
+       RowBox[{"traceresult", ",", 
+        RowBox[{"{", 
+         RowBox[{"1", ",", "2"}], "}"}]}], "]"}]}], ";", 
+     RowBox[{"contractorder", "=", 
+      RowBox[{"DeleteCases", "[", 
+       RowBox[{"contractorder", ",", 
+        RowBox[{"Alternatives", "@@", 
+         RowBox[{"Flatten", "[", 
+          RowBox[{"traceresult", "[", 
+           RowBox[{"[", "3", "]"}], "]"}], "]"}]}]}], "]"}]}], ";", 
+     "\[IndentingNewLine]", 
+     RowBox[{"(*", 
+      RowBox[{"do", " ", "all", " ", "binary", " ", "contractions"}], "*)"}], 
+     "\[IndentingNewLine]", 
+     RowBox[{"While", "[", 
+      RowBox[{
+       RowBox[{"contractorder", "!=", 
+        RowBox[{"{", "}"}]}], ",", 
+       RowBox[{
+        RowBox[{"contractingindices", "=", 
+         RowBox[{"contractorder", "[", 
+          RowBox[{"[", "1", "]"}], "]"}]}], ";", 
+        RowBox[{"contractlocation", "=", 
+         RowBox[{"Position", "[", 
+          RowBox[{"connectlist", ",", "contractingindices"}], "]"}]}], ";", 
+        RowBox[{"tensoraindices", "=", 
+         RowBox[{"Part", "[", 
+          RowBox[{"connectlist", ",", 
+           RowBox[{"Part", "[", 
+            RowBox[{"contractlocation", ",", "1", ",", "1"}], "]"}]}], 
+          "]"}]}], ";", 
+        RowBox[{"tensorbindices", "=", 
+         RowBox[{"Part", "[", 
+          RowBox[{"connectlist", ",", 
+           RowBox[{"Part", "[", 
+            RowBox[{"contractlocation", ",", "2", ",", "1"}], "]"}]}], 
+          "]"}]}], ";", 
+        RowBox[{"countmany", "=", 
+         RowBox[{"Intersection", "[", 
+          RowBox[{"tensoraindices", ",", "tensorbindices"}], "]"}]}], ";", 
+        "\[IndentingNewLine]", 
+        RowBox[{"acont", "=", 
+         RowBox[{"Flatten", "[", 
+          RowBox[{"Map", "[", 
+           RowBox[{
+            RowBox[{
+             RowBox[{"Position", "[", 
+              RowBox[{"tensoraindices", ",", "#"}], "]"}], "&"}], ",", 
+            "countmany"}], "]"}], "]"}]}], ";", 
+        RowBox[{"bcont", "=", 
+         RowBox[{"Flatten", "[", 
+          RowBox[{"Map", "[", 
+           RowBox[{
+            RowBox[{
+             RowBox[{"Position", "[", 
+              RowBox[{"tensorbindices", ",", "#"}], "]"}], "&"}], ",", 
+            "countmany"}], "]"}], "]"}]}], ";", 
+        RowBox[{"af", "=", 
+         RowBox[{"Delete", "[", 
+          RowBox[{"tensoraindices", ",", 
+           RowBox[{"Partition", "[", 
+            RowBox[{"acont", ",", "1"}], "]"}]}], "]"}]}], ";", 
+        RowBox[{"bf", "=", 
+         RowBox[{"Delete", "[", 
+          RowBox[{"tensorbindices", ",", 
+           RowBox[{"Partition", "[", 
+            RowBox[{"bcont", ",", "1"}], "]"}]}], "]"}]}], ";", 
+        "\[IndentingNewLine]", 
+        RowBox[{"AppendTo", "[", 
+         RowBox[{"tensorlist", ",", 
+          RowBox[{"TensorDotProduct", "[", 
+           RowBox[{
+            RowBox[{"Part", "[", 
+             RowBox[{"tensorlist", ",", 
+              RowBox[{"Part", "[", 
+               RowBox[{"contractlocation", ",", "1", ",", "1"}], "]"}]}], 
+             "]"}], ",", 
+            RowBox[{"Part", "[", 
+             RowBox[{"tensorlist", ",", 
+              RowBox[{"Part", "[", 
+               RowBox[{"contractlocation", ",", "2", ",", "1"}], "]"}]}], 
+             "]"}], ",", "acont", ",", "bcont"}], "]"}]}], "]"}], ";", 
+        RowBox[{"AppendTo", "[", 
+         RowBox[{"connectlist", ",", 
+          RowBox[{"Join", "[", 
+           RowBox[{"af", ",", "bf"}], "]"}]}], "]"}], ";", 
+        "\[IndentingNewLine]", 
+        RowBox[{"tensorlist", "=", 
+         RowBox[{"Delete", "[", 
+          RowBox[{"tensorlist", ",", 
+           RowBox[{"Partition", "[", 
+            RowBox[{
+             RowBox[{"Part", "[", 
+              RowBox[{"contractlocation", ",", "All", ",", "1"}], "]"}], ",", 
+             "1"}], "]"}]}], "]"}]}], ";", 
+        RowBox[{"connectlist", "=", 
+         RowBox[{"Delete", "[", 
+          RowBox[{"connectlist", ",", 
+           RowBox[{"Partition", "[", 
+            RowBox[{
+             RowBox[{"Part", "[", 
+              RowBox[{"contractlocation", ",", "All", ",", "1"}], "]"}], ",", 
+             "1"}], "]"}]}], "]"}]}], ";", "\[IndentingNewLine]", 
+        RowBox[{"contractorder", "=", 
+         RowBox[{"DeleteCases", "[", 
+          RowBox[{"contractorder", ",", 
+           RowBox[{"Alternatives", "@@", "countmany"}]}], "]"}]}], ";"}]}], 
+      "\[IndentingNewLine]", "]"}], ";", "\[IndentingNewLine]", 
+     RowBox[{"(*", 
+      RowBox[{"do", " ", "all", " ", "tensorproducts"}], "*)"}], 
+     "\[IndentingNewLine]", 
+     RowBox[{"If", "[", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"Length", "[", "tensorlist", "]"}], ">", "1"}], ",", 
+       RowBox[{
+        RowBox[{"tensorlist", "=", 
+         RowBox[{"{", 
+          RowBox[{"TensorProduct", "@@", "tensorlist"}], "}"}]}], ";", 
+        RowBox[{"connectlist", "=", 
+         RowBox[{"{", 
+          RowBox[{"Flatten", "[", "connectlist", "]"}], "}"}]}], ";"}]}], 
+      "]"}], ";", "\[IndentingNewLine]", 
+     RowBox[{"(*", 
+      RowBox[{"do", " ", "final", " ", "permutation"}], "*)"}], 
+     "\[IndentingNewLine]", 
+     RowBox[{"If", "[", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"Length", "[", 
+         RowBox[{"connectlist", "[", 
+          RowBox[{"[", "1", "]"}], "]"}], "]"}], ">", "0"}], ",", 
+       RowBox[{"If", "[", 
+        RowBox[{
+         RowBox[{"finalorder", "==", 
+          RowBox[{"{", "}"}]}], ",", 
+         RowBox[{
+          RowBox[{"finalorder", "=", 
+           RowBox[{"Cases", "[", 
+            RowBox[{"flatconnect", ",", 
+             RowBox[{"_", "?", "Negative"}]}], "]"}]}], ";", 
+          RowBox[{"transposepara", "=", 
+           RowBox[{"Flatten", "[", 
+            RowBox[{
+             RowBox[{
+              RowBox[{"Position", "[", 
+               RowBox[{"finalorder", ",", "#"}], "]"}], "&"}], "/@", 
+             RowBox[{"connectlist", "[", 
+              RowBox[{"[", "1", "]"}], "]"}]}], "]"}]}], ";", 
+          RowBox[{"Return", "[", 
+           RowBox[{"Transpose", "[", 
+            RowBox[{
+             RowBox[{"tensorlist", "[", 
+              RowBox[{"[", "1", "]"}], "]"}], ",", "transposepara"}], "]"}], 
+           "]"}]}], ",", 
+         RowBox[{
+          RowBox[{"transposepara", "=", 
+           RowBox[{"Flatten", "[", 
+            RowBox[{
+             RowBox[{
+              RowBox[{"Position", "[", 
+               RowBox[{"finalorder", ",", "#"}], "]"}], "&"}], "/@", 
+             RowBox[{"connectlist", "[", 
+              RowBox[{"[", "1", "]"}], "]"}]}], "]"}]}], ";", 
+          RowBox[{"Return", "[", 
+           RowBox[{"Transpose", "[", 
+            RowBox[{
+             RowBox[{"tensorlist", "[", 
+              RowBox[{"[", "1", "]"}], "]"}], ",", "transposepara"}], "]"}], 
+           "]"}]}]}], "]"}], ",", 
+       RowBox[{"Return", "[", 
+        RowBox[{"tensorlist", "[", 
+         RowBox[{"[", "1", "]"}], "]"}], "]"}]}], "]"}]}]}], 
+   "\[IndentingNewLine]", "]"}]}]], "Input",
+ CellChangeTimes->{{3.835153423235431*^9, 3.835153535178671*^9}, {
+   3.8351537296355467`*^9, 3.835153767300665*^9}, {3.8351538124776125`*^9, 
+   3.8351538421813235`*^9}, {3.8351542842911243`*^9, 3.835154308611098*^9}, {
+   3.835186202805835*^9, 3.835186209253863*^9}, {3.8351862948490343`*^9, 
+   3.835186330342606*^9}, {3.835186366436579*^9, 3.835186376884802*^9}, {
+   3.8352740486807756`*^9, 3.835274080417366*^9}, 3.8352741666323695`*^9, {
+   3.8352742313204813`*^9, 3.835274261203051*^9}, {3.835274315528023*^9, 
+   3.8352744168391075`*^9}, {3.835274749833129*^9, 3.835274770462263*^9}, {
+   3.8352748343925247`*^9, 3.8352749108015265`*^9}, {3.835274985577443*^9, 
+   3.835274987020048*^9}, {3.8353280809861774`*^9, 3.8353281050753207`*^9}, {
+   3.835350995353413*^9, 3.835350998446122*^9}, {3.8353510355734234`*^9, 
+   3.8353510486273255`*^9}, {3.8353511540144663`*^9, 
+   3.8353511596531935`*^9}, {3.8353516104257965`*^9, 3.835351736055299*^9}, 
+   3.835351792780771*^9, {3.8353518924441996`*^9, 3.8353519156398973`*^9}, {
+   3.8353519587958727`*^9, 3.835351961417632*^9}, {3.835353473153658*^9, 
+   3.8353535745406356`*^9}, {3.8353537527150574`*^9, 
+   3.8353538150746956`*^9}, {3.8353594626005836`*^9, 3.835359529596655*^9}, 
+   3.8353597261417828`*^9, {3.835359834295224*^9, 3.8353598372488356`*^9}, {
+   3.8353604489005413`*^9, 3.8353604961195216`*^9}, {3.8353609379347353`*^9, 
+   3.835360975657689*^9}, {3.8353610154190283`*^9, 3.8353611271247735`*^9}, 
+   3.835361157401244*^9, {3.8353611980163374`*^9, 3.8353613506806836`*^9}, {
+   3.8353615110770445`*^9, 3.835361576620557*^9}, {3.835362704618062*^9, 
+   3.8353627660697803`*^9}, {3.835434667960514*^9, 3.835434668591202*^9}, {
+   3.8354347320803027`*^9, 3.835434733519453*^9}, {3.8354347752915664`*^9, 
+   3.835434877022663*^9}, {3.8354350980645*^9, 3.8354351339573607`*^9}, {
+   3.8354351918764973`*^9, 3.835435207135613*^9}, {3.8354356917267523`*^9, 
+   3.835435697057789*^9}, 3.8354357354547305`*^9, {3.835444248468797*^9, 
+   3.835444317879384*^9}, {3.8354443524017534`*^9, 3.8354443691558237`*^9}, {
+   3.835444410631262*^9, 3.835444428454399*^9}, {3.8354451149836044`*^9, 
+   3.835445119904215*^9}, {3.8354452452373557`*^9, 3.835445303292278*^9}, {
+   3.8354455402233047`*^9, 3.835445554316292*^9}, {3.835445596462961*^9, 
+   3.835445628097473*^9}, {3.835445661321043*^9, 3.835445682824731*^9}, {
+   3.8354458300172977`*^9, 3.8354458352629623`*^9}, {3.8354459826647806`*^9, 
+   3.835445990368804*^9}, {3.8354460821395693`*^9, 3.83544612449376*^9}, {
+   3.835446887430088*^9, 3.8354469165657825`*^9}, {3.8354472075782814`*^9, 
+   3.835447279157982*^9}, {3.835447338061578*^9, 3.8354473472264833`*^9}, {
+   3.8354475474554043`*^9, 3.835447616109459*^9}, {3.8354477424157767`*^9, 
+   3.835447761758453*^9}, {3.8354477949281435`*^9, 3.835447871474558*^9}, {
+   3.8354479543159494`*^9, 3.8354479718023715`*^9}, {3.83544882932185*^9, 
+   3.835448889962953*^9}, {3.8354489811530914`*^9, 3.835448994234866*^9}, {
+   3.835449044146772*^9, 3.83544904981854*^9}, {3.8354490955155444`*^9, 
+   3.8354491055679083`*^9}, {3.835449300626346*^9, 3.835449308933174*^9}, {
+   3.8354493534132605`*^9, 3.8354494703810883`*^9}, {3.8355208938382735`*^9, 
+   3.8355209364284167`*^9}, {3.8355215198433533`*^9, 
+   3.8355215588697233`*^9}, {3.8355216268119144`*^9, 
+   3.8355216515295057`*^9}, {3.8355216953194695`*^9, 3.835521705925544*^9}, {
+   3.835521767599147*^9, 3.8355218763889365`*^9}, {3.835521989718502*^9, 
+   3.83552209834008*^9}, 3.835522862980528*^9, {3.8355232621043763`*^9, 
+   3.8355232658264613`*^9}, 3.835595996688532*^9, {3.835596398913412*^9, 
+   3.8355964079505234`*^9}, {3.8355970420169697`*^9, 
+   3.8355970881029367`*^9}, {3.8355972830946245`*^9, 3.8355973017340612`*^9}, 
+   3.8355982169544783`*^9, 3.835599983113716*^9, {3.83560018451661*^9, 
+   3.835600189334459*^9}, 3.8356003431680155`*^9, {3.8356014459936647`*^9, 
+   3.8356014710779057`*^9}, {3.835601606654443*^9, 3.8356016449011836`*^9}, {
+   3.8356016751225233`*^9, 3.8356017100376616`*^9}, {3.835604672906644*^9, 
+   3.835604673708119*^9}, {3.835604772754429*^9, 3.835604773249403*^9}, {
+   3.835607392889495*^9, 3.835607408984109*^9}, {3.835607619879528*^9, 
+   3.8356076281553087`*^9}, {3.835607668832967*^9, 3.8356076806642027`*^9}, {
+   3.835612707170287*^9, 3.8356127654742427`*^9}, {3.8356179846823378`*^9, 
+   3.8356179876941676`*^9}},
+ CellLabel->
+  "In[124]:=",ExpressionUUID->"aebd874b-9881-4d52-9fc0-4d83dec5435f"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"TensorReorder", "[", 
+   RowBox[{"tensor_List", ",", "indices_List"}], "]"}], ":=", 
+  RowBox[{"Module", "[", 
+   RowBox[{
+    RowBox[{"{", 
+     RowBox[{"tensorindices", ",", "processindices"}], "}"}], ",", 
+    RowBox[{
+     RowBox[{"tensorindices", "=", 
+      RowBox[{"Range", "[", 
+       RowBox[{"TensorRank", "[", "tensor", "]"}], "]"}]}], ";", 
+     RowBox[{"processindices", "=", 
+      RowBox[{"Flatten", "[", 
+       RowBox[{
+        RowBox[{
+         RowBox[{"Position", "[", 
+          RowBox[{"indices", ",", "#"}], "]"}], "&"}], "/@", 
+        "tensorindices"}], "]"}]}], ";", 
+     RowBox[{"Transpose", "[", 
+      RowBox[{"tensor", ",", "processindices"}], "]"}]}]}], "]"}]}]], "Input",
+ CellChangeTimes->{{3.819946057333471*^9, 3.8199461151890116`*^9}, {
+  3.8199461513645563`*^9, 3.8199462564881*^9}, {3.8199463023507137`*^9, 
+  3.8199463691256337`*^9}, {3.834065217186576*^9, 3.834065235631215*^9}},
+ CellLabel->
+  "In[125]:=",ExpressionUUID->"cd9c83f4-e85d-4308-b019-0be15e8992ea"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"TensorDotProduct", "[", 
+   RowBox[{
+   "a_List", ",", "b_List", ",", "acontract_List", ",", "bcontract_List"}], 
+   "]"}], ":=", "\[IndentingNewLine]", 
+  RowBox[{"Module", "[", 
+   RowBox[{
+    RowBox[{"{", 
+     RowBox[{
+     "afree", ",", "bfree", ",", "apermutation", ",", "bpermutation", ",", 
+      "newt"}], "}"}], ",", 
+    RowBox[{
+     RowBox[{"afree", "=", 
+      RowBox[{"DeleteCases", "[", 
+       RowBox[{
+        RowBox[{"Range", "[", 
+         RowBox[{"TensorRank", "[", "a", "]"}], "]"}], ",", 
+        RowBox[{"Alternatives", "@@", 
+         RowBox[{"Sort", "[", "acontract", "]"}]}]}], "]"}]}], ";", 
+     RowBox[{"bfree", "=", 
+      RowBox[{"DeleteCases", "[", 
+       RowBox[{
+        RowBox[{"Range", "[", 
+         RowBox[{"TensorRank", "[", "b", "]"}], "]"}], ",", 
+        RowBox[{"Alternatives", "@@", 
+         RowBox[{"Sort", "[", "bcontract", "]"}]}]}], "]"}]}], ";", 
+     RowBox[{"apermutation", "=", 
+      RowBox[{"Join", "[", 
+       RowBox[{"afree", ",", "acontract"}], "]"}]}], ";", 
+     RowBox[{"bpermutation", "=", 
+      RowBox[{"Join", "[", 
+       RowBox[{"bcontract", ",", "bfree"}], "]"}]}], ";", 
+     RowBox[{"newt", "=", 
+      RowBox[{"ArrayReshape", "[", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{"ArrayReshape", "[", 
+           RowBox[{
+            RowBox[{"TensorReorder", "[", 
+             RowBox[{"a", ",", "apermutation"}], "]"}], ",", 
+            RowBox[{"{", 
+             RowBox[{
+              RowBox[{"Times", "@@", 
+               RowBox[{"(", 
+                RowBox[{"Part", "[", 
+                 RowBox[{
+                  RowBox[{"Dimensions", "[", "a", "]"}], ",", "afree"}], 
+                 "]"}], ")"}]}], ",", 
+              RowBox[{"Times", "@@", 
+               RowBox[{"(", 
+                RowBox[{"Part", "[", 
+                 RowBox[{
+                  RowBox[{"Dimensions", "[", "a", "]"}], ",", "acontract"}], 
+                 "]"}], ")"}]}]}], "}"}]}], "]"}], ".", 
+          RowBox[{"ArrayReshape", "[", 
+           RowBox[{
+            RowBox[{"TensorReorder", "[", 
+             RowBox[{"b", ",", "bpermutation"}], "]"}], ",", 
+            RowBox[{"{", 
+             RowBox[{
+              RowBox[{"Times", "@@", 
+               RowBox[{"(", 
+                RowBox[{"Part", "[", 
+                 RowBox[{
+                  RowBox[{"Dimensions", "[", "b", "]"}], ",", "bcontract"}], 
+                 "]"}], ")"}]}], ",", 
+              RowBox[{"Times", "@@", 
+               RowBox[{"(", 
+                RowBox[{"Part", "[", 
+                 RowBox[{
+                  RowBox[{"Dimensions", "[", "b", "]"}], ",", "bfree"}], 
+                 "]"}], ")"}]}]}], "}"}]}], "]"}]}], ")"}], ",", 
+        RowBox[{"Join", "[", 
+         RowBox[{
+          RowBox[{"Part", "[", 
+           RowBox[{
+            RowBox[{"Dimensions", "[", "a", "]"}], ",", "afree"}], "]"}], ",", 
+          RowBox[{"Part", "[", 
+           RowBox[{
+            RowBox[{"Dimensions", "[", "b", "]"}], ",", "bfree"}], "]"}]}], 
+         "]"}]}], "]"}]}], ";", "newt"}]}], "\[IndentingNewLine]", 
+   "]"}]}]], "Input",
+ CellChangeTimes->{{3.834065136649089*^9, 3.834065157269348*^9}, {
+   3.834065202329511*^9, 3.8340652128734636`*^9}, {3.834065274355833*^9, 
+   3.8340653178591156`*^9}, {3.8340653671193604`*^9, 3.834065380418559*^9}, {
+   3.8340654134560375`*^9, 3.8340654557282906`*^9}, {3.834065585912114*^9, 
+   3.8340656212452374`*^9}, {3.8340666880705338`*^9, 
+   3.8340668020679564`*^9}, {3.8340668330708895`*^9, 
+   3.8340668891311617`*^9}, {3.8340705123083696`*^9, 3.8340705774407578`*^9}, 
+   3.834071370010228*^9, {3.8340714341105757`*^9, 3.8340714425377655`*^9}, {
+   3.8340715195540934`*^9, 3.8340716405411806`*^9}, {3.8340729582510033`*^9, 
+   3.83407299317924*^9}, {3.8340730987851253`*^9, 3.83407313110929*^9}, {
+   3.834073192452175*^9, 3.8340731984419107`*^9}, {3.834073230880845*^9, 
+   3.8340732370334578`*^9}, {3.8340765307892456`*^9, 
+   3.8340765396864433`*^9}, {3.8340765732332854`*^9, 3.83407658331037*^9}, {
+   3.834076721398995*^9, 3.834076740286126*^9}, 3.8340771126775956`*^9, {
+   3.834077268304947*^9, 3.834077275021567*^9}, {3.8342079488935685`*^9, 
+   3.834207962778443*^9}, {3.8342080136274776`*^9, 3.834208014613299*^9}, {
+   3.8342080718192377`*^9, 3.834208181155301*^9}, {3.834208214948784*^9, 
+   3.8342082256658983`*^9}, {3.8342089541336813`*^9, 
+   3.8342089756158705`*^9}, {3.8342127115572824`*^9, 3.834212718426293*^9}, {
+   3.8342323025303144`*^9, 3.834232405192114*^9}, {3.8350878457709665`*^9, 
+   3.835087873435977*^9}, 3.835596129790486*^9, {3.8356127746821127`*^9, 
+   3.835612815873347*^9}},
+ CellLabel->
+  "In[126]:=",ExpressionUUID->"464bd444-70e3-406f-bf6d-8b2cb75ae35c"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"TensorPartialTrace", "[", 
+   RowBox[{"tensor_List", ",", "indices_List"}], "]"}], ":=", 
+  RowBox[{"Module", "[", 
+   RowBox[{
+    RowBox[{"{", 
+     RowBox[{
+     "unduplicatedindices", ",", "contractindices", ",", "contractposition", 
+      ",", "newt", ",", "newi"}], "}"}], ",", "\[IndentingNewLine]", 
+    RowBox[{
+     RowBox[{"unduplicatedindices", "=", 
+      RowBox[{"DeleteDuplicates", "[", "indices", "]"}]}], ";", 
+     RowBox[{"If", "[", 
+      RowBox[{
+       RowBox[{
+        RowBox[{
+         RowBox[{"Length", "[", "indices", "]"}], "-", 
+         RowBox[{"Length", "[", "unduplicatedindices", "]"}]}], ">", "0"}], 
+       ",", "\[IndentingNewLine]", 
+       RowBox[{
+        RowBox[{"contractindices", "=", 
+         RowBox[{"Select", "[", 
+          RowBox[{"unduplicatedindices", ",", 
+           RowBox[{
+            RowBox[{
+             RowBox[{"Count", "[", 
+              RowBox[{"indices", ",", "#"}], "]"}], ">", "1"}], "&"}]}], 
+          "]"}]}], ";", 
+        RowBox[{"contractposition", "=", 
+         RowBox[{"Select", "[", 
+          RowBox[{
+           RowBox[{
+            RowBox[{
+             RowBox[{"Flatten", "[", 
+              RowBox[{"Position", "[", 
+               RowBox[{"indices", ",", "#"}], "]"}], "]"}], "&"}], "/@", 
+            "contractindices"}], ",", 
+           RowBox[{
+            RowBox[{
+             RowBox[{"Length", "[", "#", "]"}], "\[NotEqual]", "1"}], "&"}]}],
+           "]"}]}], ";", "\[IndentingNewLine]", 
+        RowBox[{"newt", "=", 
+         RowBox[{"TensorContract", "[", 
+          RowBox[{"tensor", ",", "contractposition"}], "]"}]}], ";", 
+        RowBox[{"newi", "=", 
+         RowBox[{"DeleteCases", "[", 
+          RowBox[{"unduplicatedindices", ",", 
+           RowBox[{"Alternatives", "@@", "contractindices"}]}], "]"}]}], ";", 
+        RowBox[{"Flatten", "[", 
+         RowBox[{
+          RowBox[{"{", 
+           RowBox[{"newt", ",", "newi", ",", "contractindices"}], "}"}], ",", 
+          RowBox[{"{", "1", "}"}]}], "]"}]}], ",", 
+       RowBox[{"Flatten", "[", 
+        RowBox[{
+         RowBox[{"{", 
+          RowBox[{"tensor", ",", "indices", ",", 
+           RowBox[{"{", "}"}]}], "}"}], ",", 
+         RowBox[{"{", "1", "}"}]}], "]"}]}], "]"}]}]}], "]"}]}]], "Input",
+ CellChangeTimes->{{3.8341526884688797`*^9, 3.8341526907679343`*^9}, {
+   3.8341546297166758`*^9, 3.834154635331592*^9}, {3.834154668512004*^9, 
+   3.834154699507615*^9}, {3.8341548045589075`*^9, 3.8341548561990237`*^9}, {
+   3.8341551305409317`*^9, 3.834155176116005*^9}, {3.834155209530057*^9, 
+   3.8341552250077996`*^9}, 3.83415620190073*^9, {3.8341562456421003`*^9, 
+   3.8341562484254303`*^9}, {3.834156306793205*^9, 3.834156309343005*^9}, 
+   3.8344117813181133`*^9, {3.835094664785404*^9, 3.835094667092218*^9}, {
+   3.835240235196912*^9, 3.8352402411590405`*^9}, {3.8352439063925467`*^9, 
+   3.8352440277891483`*^9}, {3.8352441677578716`*^9, 
+   3.8352442485211983`*^9}, {3.8352443968276052`*^9, 3.835244409210358*^9}, {
+   3.8355223140379095`*^9, 3.835522327053068*^9}, {3.835522364673984*^9, 
+   3.8355223851938343`*^9}, {3.8356128442488875`*^9, 3.835612863413554*^9}},
+ CellLabel->
+  "In[127]:=",ExpressionUUID->"22f91a96-9c98-4161-ba28-47147b554782"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"NconInputCheck", "[", 
+   RowBox[{
+   "connectlist_List", ",", "flatconnect_List", ",", "dimensionlist_List", 
+    ",", "contractorder_List"}], "]"}], ":=", 
+  RowBox[{"Module", "[", 
+   RowBox[{
+    RowBox[{"{", 
+     RowBox[{
+     "positiveindices", ",", "negativeindices", ",", "\[IndentingNewLine]", 
+      RowBox[{"(*", 
+       RowBox[{
+       "check", " ", "that", " ", "lengths", " ", "of", " ", "lists", " ", 
+        "match"}], "*)"}], "dimensionlistlength", ",", "connectlistlength", 
+      ",", "\[IndentingNewLine]", 
+      RowBox[{"(*", 
+       RowBox[{
+       "check", " ", "that", " ", "tensors", " ", "have", " ", "the", " ", 
+        "right", " ", "number", " ", "of", " ", "indices"}], "*)"}], 
+      "dimensionlistlengthtable", ",", "connectlistlengthtable", ",", 
+      "dimensionconnectdismatchtable", ",", "\[IndentingNewLine]", 
+      RowBox[{"(*", 
+       RowBox[{
+       "check", " ", "that", " ", "indices", " ", "are", " ", "valid"}], 
+       "*)"}], "unduplicatednegative", ",", "unduplicatedpositive", ",", 
+      "negativeindicesnumber", ",", "positiveindicesnumber", ",", 
+      "standnegativeindicestimes", ",", "standpositiveindicestimes", ",", 
+      "countsnegativeindices", ",", "countspositiveindices", ",", 
+      "wrongnegativeindices", ",", "wrongpositiveindices", ",", 
+      "contractposition", ",", "dimensionmatch", ",", 
+      "wrongpositivedimensionpositions"}], "}"}], ",", "\[IndentingNewLine]", 
+    RowBox[{
+     RowBox[{"positiveindices", "=", 
+      RowBox[{"Cases", "[", 
+       RowBox[{"flatconnect", ",", 
+        RowBox[{"_", "?", "Positive"}]}], "]"}]}], ";", 
+     RowBox[{"negativeindices", "=", 
+      RowBox[{"Cases", "[", 
+       RowBox[{"flatconnect", ",", 
+        RowBox[{"_", "?", "Negative"}]}], "]"}]}], ";", "\[IndentingNewLine]", 
+     RowBox[{"Off", "[", 
+      RowBox[{"General", "::", "partw"}], "]"}], ";", 
+     RowBox[{"Off", "[", 
+      RowBox[{"Part", "::", "partd"}], "]"}], ";", "\[IndentingNewLine]", 
+     RowBox[{"(*", 
+      RowBox[{
+      "check", " ", "that", " ", "lengths", " ", "of", " ", "lists", " ", 
+       "match"}], "*)"}], "\[IndentingNewLine]", 
+     RowBox[{"dimensionlistlength", "=", 
+      RowBox[{"Length", "[", "dimensionlist", "]"}]}], ";", 
+     "\[IndentingNewLine]", 
+     RowBox[{"connectlistlength", "=", 
+      RowBox[{"Length", "[", "connectlist", "]"}]}], ";", 
+     "\[IndentingNewLine]", 
+     RowBox[{"If", "[", 
+      RowBox[{
+       RowBox[{"dimensionlistlength", "\[NotEqual]", "connectlistlength"}], 
+       ",", 
+       RowBox[{
+        RowBox[{
+         RowBox[{"NetworkContract", "::", "len1"}], "=", 
+         RowBox[{"StringJoin", " ", "[", 
+          RowBox[{"{", 
+           RowBox[{
+            RowBox[{"ToString", "[", "dimensionlistlength", "]"}], ",", 
+            "\"\< tensors given, but \>\"", ",", 
+            RowBox[{"ToString", "[", "connectlistlength", "]"}], ",", 
+            "\"\< index sublists given\>\""}], "}"}], "]"}]}], ";", 
+        RowBox[{"Message", "[", 
+         RowBox[{"NetworkContract", "::", "len1"}], "]"}], ";"}]}], "]"}], 
+     ";", "\[IndentingNewLine]", 
+     RowBox[{"(*", 
+      RowBox[{
+      "check", " ", "that", " ", "tensors", " ", "have", " ", "the", " ", 
+       "right", " ", "number", " ", "of", " ", "indices"}], "*)"}], 
+     "\[IndentingNewLine]", 
+     RowBox[{"dimensionlistlengthtable", "=", 
+      RowBox[{"Map", "[", 
+       RowBox[{"Length", ",", "dimensionlist"}], "]"}]}], ";", 
+     RowBox[{"connectlistlengthtable", "=", 
+      RowBox[{"Map", "[", 
+       RowBox[{"Length", ",", "connectlist"}], "]"}]}], ";", 
+     "\[IndentingNewLine]", 
+     RowBox[{"If", "[", 
+      RowBox[{
+       RowBox[{"dimensionlistlengthtable", "!=", "connectlistlengthtable"}], 
+       ",", 
+       RowBox[{
+        RowBox[{"dimensionconnectdismatchtable", "=", 
+         RowBox[{"Flatten", "[", 
+          RowBox[{"Position", "[", 
+           RowBox[{
+            RowBox[{"Map", "[", 
+             RowBox[{
+              RowBox[{
+               RowBox[{
+                RowBox[{"Part", "[", 
+                 RowBox[{"dimensionlistlengthtable", ",", "#"}], "]"}], "==", 
+                RowBox[{"Part", "[", 
+                 RowBox[{"connectlistlengthtable", ",", "#"}], "]"}]}], "&"}],
+               ",", 
+              RowBox[{"Range", "[", 
+               RowBox[{"Length", "[", "connectlistlengthtable", "]"}], 
+               "]"}]}], "]"}], ",", "False"}], "]"}], "]"}]}], ";", 
+        RowBox[{
+         RowBox[{"NetworkContract", "::", "len2"}], "=", 
+         RowBox[{"StringJoin", "[", 
+          RowBox[{"\"\<No.\>\"", ",", 
+           RowBox[{"Riffle", "[", 
+            RowBox[{
+             RowBox[{"ToString", "/@", "dimensionconnectdismatchtable"}], 
+             ",", "\"\<,\>\""}], "]"}], ",", 
+           "\"\< tensors do not match their numbers of labels\>\""}], "]"}]}],
+         ";", 
+        RowBox[{"Message", "[", 
+         RowBox[{"NetworkContract", "::", "len2"}], "]"}]}]}], "]"}], ";", 
+     "\[IndentingNewLine]", 
+     RowBox[{"(*", 
+      RowBox[{
+      "check", " ", "that", " ", "contraction", " ", "order", " ", "is", " ", 
+       "valid"}], "*)"}], "\[IndentingNewLine]", 
+     RowBox[{"If", "[", 
+      RowBox[{
+       RowBox[{"!", 
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{"Sort", "[", "contractorder", "]"}], "==", 
+          RowBox[{"Sort", "[", 
+           RowBox[{"DeleteDuplicates", "[", "positiveindices", "]"}], "]"}]}],
+          ")"}]}], ",", 
+       RowBox[{
+        RowBox[{
+         RowBox[{"NetworkContract", "::", "len3"}], "=", 
+         "\"\<invalid contraction order\>\""}], ";", 
+        RowBox[{"Message", "[", 
+         RowBox[{"NetworkContract", "::", "len3"}], "]"}]}]}], "]"}], ";", 
+     RowBox[{"(*", 
+      RowBox[{
+      "check", " ", "that", " ", "negative", " ", "indices", " ", "are", " ", 
+       "valid"}], "*)"}], "\[IndentingNewLine]", 
+     RowBox[{"unduplicatednegative", "=", 
+      RowBox[{"DeleteDuplicates", "[", "negativeindices", "]"}]}], ";", 
+     RowBox[{"negativeindicesnumber", "=", 
+      RowBox[{"Length", "[", "unduplicatednegative", "]"}]}], ";", 
+     RowBox[{"standnegativeindicestimes", "=", 
+      RowBox[{"ConstantArray", "[", 
+       RowBox[{"1", ",", "negativeindicesnumber"}], "]"}]}], ";", 
+     RowBox[{"If", "[", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"Complement", "[", 
+         RowBox[{"unduplicatednegative", ",", 
+          RowBox[{"Range", "[", 
+           RowBox[{
+            RowBox[{"-", "1"}], ",", 
+            RowBox[{"-", "negativeindicesnumber"}], ",", 
+            RowBox[{"-", "1"}]}], "]"}]}], "]"}], "!=", 
+        RowBox[{"{", "}"}]}], ",", 
+       RowBox[{
+        RowBox[{
+         RowBox[{"NetworkContract", "::", "len41"}], "=", 
+         "\"\<negative indices names greater than indices number\>\""}], ";", 
+        RowBox[{"Message", "[", 
+         RowBox[{"NetworkContract", "::", "len41"}], "]"}]}], ",", 
+       RowBox[{"If", "[", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"countsnegativeindices", "=", 
+           RowBox[{"Normal", "[", 
+            RowBox[{"Counts", "[", "negativeindices", "]"}], "]"}]}], ";", 
+          RowBox[{
+           RowBox[{"countsnegativeindices", "[", 
+            RowBox[{"[", 
+             RowBox[{"All", ",", "2"}], "]"}], "]"}], "!=", 
+           "standnegativeindicestimes"}]}], ",", 
+         RowBox[{
+          RowBox[{"wrongnegativeindices", "=", 
+           RowBox[{
+            RowBox[{"Select", "[", 
+             RowBox[{"countsnegativeindices", ",", 
+              RowBox[{
+               RowBox[{
+                RowBox[{"#", "[", 
+                 RowBox[{"[", "2", "]"}], "]"}], "\[NotEqual]", "1"}], 
+               "&"}]}], "]"}], "[", 
+            RowBox[{"[", 
+             RowBox[{"All", ",", "1"}], "]"}], "]"}]}], ";", 
+          RowBox[{
+           RowBox[{"NetworkContract", "::", "len42"}], "=", 
+           RowBox[{"StringJoin", "[", 
+            RowBox[{"\"\<negative indices \>\"", ",", 
+             RowBox[{"Riffle", "[", 
+              RowBox[{
+               RowBox[{"ToString", "/@", "wrongnegativeindices"}], ",", 
+               "\"\<,\>\""}], "]"}], ",", "\"\< appear more than once\>\""}], 
+            "]"}]}], ";", 
+          RowBox[{"Message", "[", 
+           RowBox[{"NetworkContract", "::", "len42"}], "]"}]}]}], "]"}]}], 
+      "]"}], ";", "\[IndentingNewLine]", 
+     RowBox[{"(*", 
+      RowBox[{
+      "check", " ", "that", " ", "positive", " ", "indices", " ", "are", " ", 
+       "valid", " ", "and", " ", "contracted", " ", "tensor", " ", 
+       "dimensions", " ", "match"}], "*)"}], "\[IndentingNewLine]", 
+     RowBox[{"unduplicatedpositive", "=", 
+      RowBox[{"DeleteDuplicates", "[", "positiveindices", "]"}]}], ";", 
+     RowBox[{"positiveindicesnumber", "=", 
+      RowBox[{"Length", "[", "unduplicatedpositive", "]"}]}], ";", 
+     RowBox[{"standpositiveindicestimes", "=", 
+      RowBox[{"ConstantArray", "[", 
+       RowBox[{"2", ",", "positiveindicesnumber"}], "]"}]}], ";", 
+     "\[IndentingNewLine]", 
+     RowBox[{"If", "[", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"Complement", "[", 
+         RowBox[{"unduplicatedpositive", ",", 
+          RowBox[{"Range", "[", "positiveindicesnumber", "]"}]}], "]"}], "!=", 
+        RowBox[{"{", "}"}]}], ",", 
+       RowBox[{
+        RowBox[{
+         RowBox[{"NetworkContract", "::", "len51"}], "=", 
+         "\"\<positive indices names greater than indices number\>\""}], ";", 
+        RowBox[{"Message", "[", 
+         RowBox[{"NetworkContract", "::", "len51"}], "]"}]}], ",", 
+       RowBox[{"If", "[", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"countspositiveindices", "=", 
+           RowBox[{"Normal", "[", 
+            RowBox[{"Counts", "[", "positiveindices", "]"}], "]"}]}], ";", 
+          RowBox[{
+           RowBox[{"countspositiveindices", "[", 
+            RowBox[{"[", 
+             RowBox[{"All", ",", "2"}], "]"}], "]"}], "!=", 
+           "standpositiveindicestimes"}]}], ",", 
+         RowBox[{
+          RowBox[{"wrongpositiveindices", "=", 
+           RowBox[{
+            RowBox[{"Select", "[", 
+             RowBox[{"countspositiveindices", ",", 
+              RowBox[{
+               RowBox[{
+                RowBox[{"#", "[", 
+                 RowBox[{"[", "2", "]"}], "]"}], "\[NotEqual]", "2"}], 
+               "&"}]}], "]"}], "[", 
+            RowBox[{"[", 
+             RowBox[{"All", ",", "1"}], "]"}], "]"}]}], ";", 
+          RowBox[{
+           RowBox[{"NetworkContract", "::", "len52"}], "=", 
+           RowBox[{"StringJoin", "[", 
+            RowBox[{"\"\<positive indices \>\"", ",", 
+             RowBox[{"Riffle", "[", 
+              RowBox[{
+               RowBox[{"ToString", "/@", "wrongpositiveindices"}], ",", 
+               "\"\<,\>\""}], "]"}], ",", "\"\< do not appear twice\>\""}], 
+            "]"}]}], ";", 
+          RowBox[{"Message", "[", 
+           RowBox[{"NetworkContract", "::", "len52"}], "]"}]}], ",", 
+         RowBox[{"If", "[", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"contractposition", "=", 
+             RowBox[{"Select", "[", 
+              RowBox[{
+               RowBox[{
+                RowBox[{
+                 RowBox[{"Position", "[", 
+                  RowBox[{"connectlist", ",", "#"}], "]"}], "&"}], "/@", 
+                "unduplicatedpositive"}], ",", 
+               RowBox[{
+                RowBox[{
+                 RowBox[{"Length", "[", "#", "]"}], "\[Equal]", "2"}], 
+                "&"}]}], "]"}]}], ";", 
+            RowBox[{"dimensionmatch", "=", 
+             RowBox[{"Boole", "[", 
+              RowBox[{"Map", "[", 
+               RowBox[{
+                RowBox[{
+                 RowBox[{"Equal", "@@", "#"}], "&"}], ",", 
+                RowBox[{
+                 RowBox[{
+                  RowBox[{"(", 
+                   RowBox[{"Extract", "[", 
+                    RowBox[{"dimensionlist", ",", "#"}], "]"}], ")"}], "&"}], 
+                 "/@", "contractposition"}]}], "]"}], "]"}]}], ";", 
+            RowBox[{"dimensionmatch", "!=", 
+             RowBox[{"standpositiveindicestimes", "/", "2"}]}]}], ",", 
+           RowBox[{
+            RowBox[{"wrongpositivedimensionpositions", "=", 
+             RowBox[{"Flatten", "[", 
+              RowBox[{"Position", "[", 
+               RowBox[{"dimensionmatch", ",", "0"}], "]"}], "]"}]}], ";", 
+            RowBox[{
+             RowBox[{"NetworkContract", "::", "len53"}], "=", 
+             RowBox[{"StringJoin", "[", 
+              RowBox[{
+              "\"\<contracted dimension of \>\"", ",", 
+               "\"\<positive indices \>\"", ",", 
+               RowBox[{"Riffle", "[", 
+                RowBox[{
+                 RowBox[{"ToString", "/@", 
+                  RowBox[{"Part", "[", 
+                   RowBox[{
+                   "unduplicatedpositive", ",", 
+                    "wrongpositivedimensionpositions"}], "]"}]}], ",", 
+                 "\"\<,\>\""}], "]"}], ",", "\"\< are unmatched\>\""}], 
+              "]"}]}], ";", 
+            RowBox[{"Message", "[", 
+             RowBox[{"NetworkContract", "::", "len53"}], "]"}]}]}], "]"}]}], 
+        "]"}]}], "]"}], ";", 
+     RowBox[{"On", "[", 
+      RowBox[{"General", "::", "partw"}], "]"}], ";", 
+     RowBox[{"Off", "[", 
+      RowBox[{"Part", "::", "partd"}], "]"}], ";"}]}], "\[IndentingNewLine]", 
+   "\[IndentingNewLine]", "]"}]}]], "Input",
+ CellChangeTimes->{{3.834322534945691*^9, 3.8343227633448725`*^9}, {
+   3.8343228284114146`*^9, 3.834322840013995*^9}, {3.8343228899465237`*^9, 
+   3.834322932331788*^9}, {3.8343232517163506`*^9, 3.8343232757313805`*^9}, {
+   3.8343235560884748`*^9, 3.8343236324338465`*^9}, {3.834323777256395*^9, 
+   3.8343237787321663`*^9}, {3.834324803961668*^9, 3.834324945846867*^9}, {
+   3.834325640901864*^9, 3.8343256475240164`*^9}, {3.8343257096997824`*^9, 
+   3.8343257489170046`*^9}, {3.8343257864622197`*^9, 
+   3.8343259283509407`*^9}, {3.834326027189003*^9, 3.8343260547621875`*^9}, {
+   3.8343267374309797`*^9, 3.834326743320572*^9}, {3.8343267824598503`*^9, 
+   3.834326825526998*^9}, {3.8343270186621857`*^9, 3.834327068367173*^9}, {
+   3.8343271813687167`*^9, 3.8343272196516576`*^9}, {3.83432730232467*^9, 
+   3.8343273052757225`*^9}, 3.834327377251644*^9, {3.8343277341449995`*^9, 
+   3.834327749188453*^9}, {3.8343278168182955`*^9, 3.8343278747409964`*^9}, {
+   3.834327966216606*^9, 3.834327968192526*^9}, {3.8344964254039783`*^9, 
+   3.8344965480324383`*^9}, {3.8344966048729453`*^9, 3.834496715077914*^9}, {
+   3.8344974506695786`*^9, 3.834497451284727*^9}, {3.834497486139124*^9, 
+   3.8344975130382004`*^9}, {3.834497650265855*^9, 3.834497652792132*^9}, {
+   3.8344979397727084`*^9, 3.834497999324713*^9}, {3.834498155433727*^9, 
+   3.8344981558112893`*^9}, {3.834498299826295*^9, 3.8344983155288954`*^9}, {
+   3.834498451488556*^9, 3.8344984657249217`*^9}, {3.834498497974124*^9, 
+   3.8344985037949543`*^9}, {3.8344985446935673`*^9, 3.834498669442226*^9}, 
+   3.8344987510729756`*^9, {3.8344990271524568`*^9, 3.8344990275325785`*^9}, {
+   3.8344991280203767`*^9, 3.834499178245391*^9}, {3.8344992089432373`*^9, 
+   3.8344992271889944`*^9}, {3.8344993230384245`*^9, 
+   3.8344993241455984`*^9}, {3.834499369827529*^9, 3.834499474633095*^9}, {
+   3.8344995507688303`*^9, 3.8344996309021435`*^9}, {3.8344996716535244`*^9, 
+   3.8344997082858458`*^9}, {3.834499991566961*^9, 3.8344999980328727`*^9}, {
+   3.834500036009206*^9, 3.8345002150563974`*^9}, {3.834500565679813*^9, 
+   3.8345006541425867`*^9}, {3.8345009950921335`*^9, 3.8345010005958505`*^9}, 
+   3.834501053100233*^9, {3.8345010925351286`*^9, 3.834501215399149*^9}, {
+   3.8345012615848417`*^9, 3.834501264678619*^9}, {3.8345013099744806`*^9, 
+   3.834501324303585*^9}, 3.8345020375262794`*^9, {3.834502079081747*^9, 
+   3.834502158967781*^9}, {3.834502245382747*^9, 3.8345022804915977`*^9}, {
+   3.8345023356318398`*^9, 3.834502350257697*^9}, {3.8345023818823357`*^9, 
+   3.8345024825767465`*^9}, {3.8345025411359844`*^9, 3.834502590745278*^9}, {
+   3.8345026983988066`*^9, 3.834502711648759*^9}, 3.8345027710015063`*^9, {
+   3.834720077202656*^9, 3.8347201188335776`*^9}, 3.8347503065537434`*^9, 
+   3.8347513909048996`*^9, {3.834751452785087*^9, 3.834751456593546*^9}, {
+   3.834751698125275*^9, 3.834751714332609*^9}, 3.834751744425443*^9, {
+   3.834751825043474*^9, 3.8347518701229343`*^9}, {3.8347520061226864`*^9, 
+   3.8347520476918883`*^9}, {3.834752092250157*^9, 3.8347521270699463`*^9}, {
+   3.8347523168088455`*^9, 3.8347525310049667`*^9}, {3.834752568085312*^9, 
+   3.8347526370945587`*^9}, {3.8347526788864374`*^9, 3.834752701723216*^9}, {
+   3.8347527330969405`*^9, 3.834752743846236*^9}, {3.834752993899626*^9, 
+   3.8347530016795816`*^9}, 3.834757363127096*^9, 3.834757401238947*^9, {
+   3.834757441923863*^9, 3.834757457742874*^9}, {3.834757528981826*^9, 
+   3.8347575812834682`*^9}, {3.8347576204424458`*^9, 
+   3.8347576208901515`*^9}, {3.8347576925168457`*^9, 3.834757702765236*^9}, {
+   3.8347577482333565`*^9, 3.8347577605874424`*^9}, {3.8347578060632076`*^9, 
+   3.8347578242945795`*^9}, {3.8347578678817015`*^9, 3.834757882814548*^9}, {
+   3.8347582211769667`*^9, 3.8347582481261563`*^9}, {3.8347582793750668`*^9, 
+   3.834758283658169*^9}, {3.8347583511786623`*^9, 3.8347583795929685`*^9}, {
+   3.8347584667386208`*^9, 3.8347585642156544`*^9}, {3.8347586768907804`*^9, 
+   3.8347586820901814`*^9}, 3.8347587472594433`*^9, {3.8347590399444747`*^9, 
+   3.834759100257654*^9}, {3.8353440306705666`*^9, 3.8353440397589016`*^9}, 
+   3.8353441213301926`*^9, {3.8355941918628893`*^9, 3.835594194515724*^9}},
+ CellLabel->
+  "In[128]:=",ExpressionUUID->"56a49fed-9fc8-4145-aaed-40c44bacf101"]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Testing", "Subsection",
+ CellChangeTimes->{{3.835645474377575*^9, 3.83564547654578*^9}, {
+  3.8356461757858973`*^9, 
+  3.8356461777705927`*^9}},ExpressionUUID->"677fe548-e8bd-4143-849d-\
+b5800d49efc1"],
+
+Cell["Example 1.", "Text",
+ CellChangeTimes->{{3.8356176614150047`*^9, 3.835617661657777*^9}, {
+  3.835646180216056*^9, 
+  3.8356461891796923`*^9}},ExpressionUUID->"eb6ec43e-88f3-497e-aace-\
+3ab0396b7d87"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"a", "=", 
+   RowBox[{"RandomReal", "[", 
+    RowBox[{"1", ",", 
+     RowBox[{"{", 
+      RowBox[{"2", ",", "3", ",", "2", ",", "2"}], "}"}]}], "]"}]}], ";", 
+  RowBox[{"b", "=", 
+   RowBox[{"RandomReal", "[", 
+    RowBox[{"1", ",", 
+     RowBox[{"{", 
+      RowBox[{"2", ",", "3", ",", "3", ",", "3"}], "}"}]}], "]"}]}], ";", 
+  RowBox[{"c", "=", 
+   RowBox[{"RandomReal", "[", 
+    RowBox[{"1", ",", 
+     RowBox[{"{", 
+      RowBox[{"2", ",", "3", ",", "2", ",", "2"}], "}"}]}], "]"}]}], ";", 
+  RowBox[{"d", "=", 
+   RowBox[{"RandomReal", "[", 
+    RowBox[{"1", ",", 
+     RowBox[{"{", 
+      RowBox[{"3", ",", "3", ",", "3", ",", "3"}], "}"}]}], "]"}]}], 
+  ";"}]], "Input",
+ CellChangeTimes->{{3.8356174781000557`*^9, 3.835617525041993*^9}, {
+  3.835617574200612*^9, 3.8356175751186852`*^9}},
+ CellLabel->
+  "In[129]:=",ExpressionUUID->"970d7474-d146-4927-98db-06e9bdf11012"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"NetworkContract", "[", 
+   RowBox[{
+    RowBox[{"{", 
+     RowBox[{"a", ",", "b", ",", "c", ",", "d"}], "}"}], ",", 
+    RowBox[{"{", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"-", "1"}], ",", 
+        RowBox[{"-", "2"}], ",", 
+        RowBox[{"-", "3"}], ",", 
+        RowBox[{"-", "4"}]}], "}"}], ",", 
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"-", "5"}], ",", 
+        RowBox[{"-", "6"}], ",", 
+        RowBox[{"-", "7"}], ",", 
+        RowBox[{"-", "8"}]}], "}"}], ",", 
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"-", "9"}], ",", 
+        RowBox[{"-", "10"}], ",", 
+        RowBox[{"-", "11"}], ",", 
+        RowBox[{"-", "12"}]}], "}"}], ",", 
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"-", "13"}], ",", 
+        RowBox[{"-", "14"}], ",", 
+        RowBox[{"-", "15"}], ",", 
+        RowBox[{"-", "16"}]}], "}"}]}], "}"}]}], "]"}], "==", 
+  RowBox[{"TensorProduct", "[", 
+   RowBox[{"a", ",", "b", ",", "c", ",", "d"}], "]"}]}]], "Input",
+ CellChangeTimes->{{3.8356174661776466`*^9, 3.8356174726647797`*^9}, {
+  3.835617528350552*^9, 3.835617586972617*^9}, {3.835618010011565*^9, 
+  3.835618011006049*^9}},
+ CellLabel->
+  "In[130]:=",ExpressionUUID->"432f7106-7a36-4b45-ad7e-d214e8e816db"],
+
+Cell[BoxData["True"], "Output",
+ CellChangeTimes->{
+  3.8356175880280895`*^9, {3.835618001990632*^9, 3.8356180114386024`*^9}, 
+   3.8356455222342596`*^9, 3.8356455761048784`*^9},
+ CellLabel->
+  "Out[130]=",ExpressionUUID->"f0f16367-9c4d-4f4f-99cf-8af3c9e66ee1"]
+}, Open  ]],
+
+Cell["Example 2.", "Text",
+ CellChangeTimes->{{3.8356176674927645`*^9, 3.83561766829613*^9}, {
+  3.8356461921996193`*^9, 
+  3.8356461966487274`*^9}},ExpressionUUID->"8d5c8047-ea44-4b6a-bf81-\
+e9e46e58ffef"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"a", "=", 
+   RowBox[{"RandomReal", "[", 
+    RowBox[{"1", ",", 
+     RowBox[{"{", "1000", "}"}]}], "]"}]}], ";", 
+  RowBox[{"b", "=", 
+   RowBox[{"RandomReal", "[", 
+    RowBox[{"1", ",", 
+     RowBox[{"{", 
+      RowBox[{"1000", ",", "1000"}], "}"}]}], "]"}]}], ";", 
+  RowBox[{"c", "=", 
+   RowBox[{"RandomReal", "[", 
+    RowBox[{"1", ",", 
+     RowBox[{"{", "1000", "}"}]}], "]"}]}], ";"}]], "Input",
+ CellChangeTimes->{{3.8356176120234632`*^9, 3.8356176386401815`*^9}},
+ CellLabel->
+  "In[131]:=",ExpressionUUID->"5ed55f61-c25d-419d-ac82-c07eebf651aa"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"NetworkContract", "[", 
+   RowBox[{
+    RowBox[{"{", 
+     RowBox[{"a", ",", "b", ",", "c"}], "}"}], ",", 
+    RowBox[{"{", 
+     RowBox[{
+      RowBox[{"{", "1", "}"}], ",", 
+      RowBox[{"{", 
+       RowBox[{"1", ",", "2"}], "}"}], ",", 
+      RowBox[{"{", "2", "}"}]}], "}"}]}], "]"}], "\[Equal]", 
+  RowBox[{"a", ".", "b", ".", "c"}]}]], "Input",
+ CellChangeTimes->{
+  3.8356176442930927`*^9, {3.835617680733271*^9, 3.8356177048518405`*^9}},
+ CellLabel->
+  "In[132]:=",ExpressionUUID->"e4fc0314-7333-4097-af9b-a5649d7a4051"],
+
+Cell[BoxData["True"], "Output",
+ CellChangeTimes->{3.8356177120718026`*^9, 3.835618040052085*^9, 
+  3.835645581847622*^9},
+ CellLabel->
+  "Out[132]=",ExpressionUUID->"252d4da2-4d97-499c-8c0a-33ca1ef28da8"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"NetworkContract", "[", 
+   RowBox[{
+    RowBox[{"{", 
+     RowBox[{"a", ",", "b", ",", "c"}], "}"}], ",", 
+    RowBox[{"{", 
+     RowBox[{
+      RowBox[{"{", "1", "}"}], ",", 
+      RowBox[{"{", 
+       RowBox[{"1", ",", "2"}], "}"}], ",", 
+      RowBox[{"{", "2", "}"}]}], "}"}]}], "]"}], "//", 
+  "AbsoluteTiming"}]], "Input",
+ CellChangeTimes->{{3.8356177210585623`*^9, 3.8356177229768553`*^9}},
+ CellLabel->
+  "In[135]:=",ExpressionUUID->"0dbb5391-bf80-488d-b2c6-385a38edb700"],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{"0.0023888`", ",", "125742.0788291026`"}], "}"}]], "Output",
+ CellChangeTimes->{
+  3.83561772387218*^9, 3.835618041206224*^9, {3.835645587901121*^9, 
+   3.8356456173905373`*^9}},
+ CellLabel->
+  "Out[135]=",ExpressionUUID->"96cf2232-a118-48dc-95f2-8a311ee1a875"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"TensorContract", "[", 
+  RowBox[{
+   RowBox[{"TensorProduct", "[", 
+    RowBox[{"a", ",", "b", ",", "c"}], "]"}], ",", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"1", ",", "2"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"2", ",", "3"}], "}"}]}], "}"}]}], "]"}]], "Input",
+ CellChangeTimes->{{3.835617728544044*^9, 3.835617773217657*^9}, {
+   3.8356180552401266`*^9, 3.8356180561473083`*^9}, 3.8356456106865945`*^9},
+ CellLabel->
+  "In[134]:=",ExpressionUUID->"988ae5d7-52e4-486c-b089-fd19068db158"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "General", "nomem", 
+   "\"The current computation was aborted because there was insufficient \
+memory available to complete the computation.\"", 2, 134, 12, 
+   28101822483137558755, "Local"},
+  "MessageTemplate"]], "Message", "MSG",
+ CellChangeTimes->{
+  3.835617773758814*^9, {3.8356180494582863`*^9, 3.8356180565639973`*^9}, 
+   3.8356456123531537`*^9},
+ CellLabel->
+  "\:6b63\:5728\:8ba1\:7b97In[134]:=",ExpressionUUID->"07b997e9-bbe0-4bfc-\
+9404-8a146ac087f8"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "Throw", "sysexc", 
+   "\"Uncaught SystemException returned to top level. Can be caught with \
+Catch[\[Ellipsis], _SystemException].\"", 2, 134, 13, 28101822483137558755, 
+   "Local"},
+  "MessageTemplate"]], "Message", "MSG",
+ CellChangeTimes->{
+  3.835617773758814*^9, {3.8356180494582863`*^9, 3.8356180565639973`*^9}, 
+   3.83564561438608*^9},
+ CellLabel->
+  "\:6b63\:5728\:8ba1\:7b97In[134]:=",ExpressionUUID->"ee18a674-243d-4406-\
+b614-86e86c6a1167"],
+
+Cell[BoxData[
+ RowBox[{"SystemException", "[", "\<\"MemoryAllocationFailure\"\>", 
+  "]"}]], "Output",
+ CellChangeTimes->{
+  3.8356177753141565`*^9, {3.8356180509776297`*^9, 3.8356180571751375`*^9}, 
+   3.835645614405589*^9},
+ CellLabel->
+  "Out[134]=",ExpressionUUID->"1f13ff14-5771-4873-8d4f-2163bfaa03dc"]
+}, Open  ]],
+
+Cell["Example 3.", "Text",
+ CellChangeTimes->{{3.8356180875032206`*^9, 3.8356180877513294`*^9}, {
+  3.835646199705324*^9, 
+  3.835646204793976*^9}},ExpressionUUID->"7a701cf0-4318-45d1-b63a-\
+5b1ab025d016"],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"a", "=", 
+   RowBox[{"RandomReal", "[", 
+    RowBox[{"1", ",", 
+     RowBox[{"{", 
+      RowBox[{"2", ",", "3", ",", "4", ",", "2", ",", "2"}], "}"}]}], "]"}]}],
+   ";", 
+  RowBox[{"b", "=", 
+   RowBox[{"RandomReal", "[", 
+    RowBox[{"1", ",", 
+     RowBox[{"{", 
+      RowBox[{"2", ",", "3", ",", "3"}], "}"}]}], "]"}]}], ";", 
+  RowBox[{"c", "=", 
+   RowBox[{"RandomReal", "[", 
+    RowBox[{"1", ",", 
+     RowBox[{"{", 
+      RowBox[{"3", ",", "2", ",", "2", ",", "2"}], "}"}]}], "]"}]}], ";", 
+  RowBox[{"d", "=", 
+   RowBox[{"RandomReal", "[", 
+    RowBox[{"1", ",", 
+     RowBox[{"{", 
+      RowBox[{"3", ",", "3", ",", "3", ",", "3"}], "}"}]}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"e", "=", 
+   RowBox[{"RandomReal", "[", 
+    RowBox[{"1", ",", 
+     RowBox[{"{", 
+      RowBox[{"3", ",", "2", ",", "2", ",", "2"}], "}"}]}], "]"}]}], 
+  ";"}]}], "Input",
+ CellChangeTimes->{{3.8356182181134777`*^9, 3.8356182222800426`*^9}, {
+  3.8356182597727804`*^9, 3.835618291741603*^9}, {3.83561842530904*^9, 
+  3.835618427402825*^9}},
+ CellLabel->
+  "In[136]:=",ExpressionUUID->"f5eaf911-99c3-47ed-9992-e9209092f8d9"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"NetworkContract", "[", 
+   RowBox[{
+    RowBox[{"{", 
+     RowBox[{"a", ",", "b", ",", "c", ",", "d", ",", "e"}], "}"}], ",", 
+    RowBox[{"{", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{"1", ",", 
+        RowBox[{"-", "1"}], ",", 
+        RowBox[{"-", "2"}], ",", "2", ",", "1"}], "}"}], ",", 
+      RowBox[{"{", 
+       RowBox[{"2", ",", 
+        RowBox[{"-", "3"}], ",", 
+        RowBox[{"-", "4"}]}], "}"}], ",", 
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"-", "5"}], ",", "3", ",", "3", ",", 
+        RowBox[{"-", "6"}]}], "}"}], ",", 
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"-", "7"}], ",", 
+        RowBox[{"-", "8"}], ",", 
+        RowBox[{"-", "9"}], ",", 
+        RowBox[{"-", "10"}]}], "}"}], ",", 
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"-", "11"}], ",", "4", ",", "4", ",", 
+        RowBox[{"-", "12"}]}], "}"}]}], "}"}]}], "]"}], "\[Equal]", 
+  RowBox[{"TensorContract", "[", 
+   RowBox[{
+    RowBox[{"TensorProduct", "[", 
+     RowBox[{"a", ",", "b", ",", "c", ",", "d", ",", "e"}], "]"}], ",", 
+    RowBox[{"{", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{"1", ",", "5"}], "}"}], ",", 
+      RowBox[{"{", 
+       RowBox[{"4", ",", "6"}], "}"}], ",", 
+      RowBox[{"{", 
+       RowBox[{"10", ",", "11"}], "}"}], ",", 
+      RowBox[{"{", 
+       RowBox[{"18", ",", "19"}], "}"}]}], "}"}]}], "]"}]}]], "Input",
+ CellChangeTimes->{{3.8356183006024704`*^9, 3.83561853320944*^9}},
+ CellLabel->
+  "In[138]:=",ExpressionUUID->"86c29eba-504a-459a-9c4a-c514e78738fd"],
+
+Cell[BoxData["True"], "Output",
+ CellChangeTimes->{3.8356185391999335`*^9, 3.835645623829832*^9},
+ CellLabel->
+  "Out[138]=",ExpressionUUID->"74911cc4-81f5-4231-bbe5-19f158c7ed7a"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"AbsoluteTiming", "[", 
+   RowBox[{"NetworkContract", "[", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"a", ",", "b", ",", "c", ",", "d", ",", "e"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"1", ",", 
+         RowBox[{"-", "1"}], ",", 
+         RowBox[{"-", "2"}], ",", "2", ",", "1"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"2", ",", 
+         RowBox[{"-", "3"}], ",", 
+         RowBox[{"-", "4"}]}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{
+         RowBox[{"-", "5"}], ",", "3", ",", "3", ",", 
+         RowBox[{"-", "6"}]}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{
+         RowBox[{"-", "7"}], ",", 
+         RowBox[{"-", "8"}], ",", 
+         RowBox[{"-", "9"}], ",", 
+         RowBox[{"-", "10"}]}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{
+         RowBox[{"-", "11"}], ",", "4", ",", "4", ",", 
+         RowBox[{"-", "12"}]}], "}"}]}], "}"}]}], "]"}], "]"}], "[", 
+  RowBox[{"[", "1", "]"}], "]"}]], "Input",
+ CellChangeTimes->{{3.8356185557603054`*^9, 3.8356185614316497`*^9}},
+ CellLabel->
+  "In[139]:=",ExpressionUUID->"ab881c41-3bb5-4e50-98f5-c70ce8487f94"],
+
+Cell[BoxData["0.005327`"], "Output",
+ CellChangeTimes->{3.835618562434201*^9, 3.8356456363085146`*^9},
+ CellLabel->
+  "Out[139]=",ExpressionUUID->"8c0dce51-4605-46bd-8f97-d0c96337924e"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"AbsoluteTiming", "[", 
+   RowBox[{"TensorContract", "[", 
+    RowBox[{
+     RowBox[{"TensorProduct", "[", 
+      RowBox[{"a", ",", "b", ",", "c", ",", "d", ",", "e"}], "]"}], ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"1", ",", "5"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"4", ",", "6"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"10", ",", "11"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"18", ",", "19"}], "}"}]}], "}"}]}], "]"}], "]"}], "[", 
+  RowBox[{"[", "1", "]"}], "]"}]], "Input",
+ CellChangeTimes->{{3.8356185698980303`*^9, 3.8356185876003504`*^9}},
+ CellLabel->
+  "In[140]:=",ExpressionUUID->"40076a75-ff67-466a-a314-60326c0741d8"],
+
+Cell[BoxData["2.1214404`"], "Output",
+ CellChangeTimes->{3.8356185885766535`*^9, 3.8356456406287456`*^9},
+ CellLabel->
+  "Out[140]=",ExpressionUUID->"87bfdb4f-8c50-4c94-a746-d22cd02ecbb3"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"NetworkContract", "[", 
+   RowBox[{
+    RowBox[{"{", 
+     RowBox[{"a", ",", "b", ",", "c", ",", "d", ",", "e"}], "}"}], ",", 
+    RowBox[{"{", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{"2", ",", 
+        RowBox[{"-", "1"}], ",", 
+        RowBox[{"-", "2"}], ",", "1", ",", "2"}], "}"}], ",", 
+      RowBox[{"{", 
+       RowBox[{"1", ",", 
+        RowBox[{"-", "3"}], ",", 
+        RowBox[{"-", "4"}]}], "}"}], ",", 
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"-", "5"}], ",", "4", ",", "4", ",", 
+        RowBox[{"-", "6"}]}], "}"}], ",", 
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"-", "7"}], ",", 
+        RowBox[{"-", "8"}], ",", 
+        RowBox[{"-", "9"}], ",", 
+        RowBox[{"-", "10"}]}], "}"}], ",", 
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"-", "11"}], ",", "3", ",", "3", ",", 
+        RowBox[{"-", "12"}]}], "}"}]}], "}"}]}], "]"}], "\[Equal]", 
+  RowBox[{"TensorContract", "[", 
+   RowBox[{
+    RowBox[{"TensorProduct", "[", 
+     RowBox[{"a", ",", "b", ",", "c", ",", "d", ",", "e"}], "]"}], ",", 
+    RowBox[{"{", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{"1", ",", "5"}], "}"}], ",", 
+      RowBox[{"{", 
+       RowBox[{"4", ",", "6"}], "}"}], ",", 
+      RowBox[{"{", 
+       RowBox[{"10", ",", "11"}], "}"}], ",", 
+      RowBox[{"{", 
+       RowBox[{"18", ",", "19"}], "}"}]}], "}"}]}], "]"}]}]], "Input",
+ CellChangeTimes->{{3.8356219564752817`*^9, 3.8356219680815687`*^9}, {
+  3.8356220055765443`*^9, 3.8356220212862806`*^9}, {3.8356221105674396`*^9, 
+  3.8356221338358045`*^9}},
+ CellLabel->
+  "In[141]:=",ExpressionUUID->"c5f4ce57-b860-449f-923b-c93ac168893c"],
+
+Cell[BoxData["True"], "Output",
+ CellChangeTimes->{{3.8356220082474394`*^9, 3.8356220226069765`*^9}, {
+   3.8356221188223324`*^9, 3.835622135072796*^9}, 3.835645646246047*^9},
+ CellLabel->
+  "Out[141]=",ExpressionUUID->"61699acc-40f9-45fc-9824-ee5b6963e455"]
+}, Open  ]]
+}, Open  ]]
+},
+WindowSize->{720, 1248},
+WindowMargins->{{Automatic, -725.5}, {Automatic, -5.5}},
+Magnification:>1.1 Inherited,
+FrontEndVersion->"12.2 for Microsoft Windows (64-bit) (2020\:5e7412\:67087\
+\:65e5)",
+StyleDefinitions->"Dracula.nb",
+ExpressionUUID->"ea676624-4e75-4bb3-9684-42d4a695e94f"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[558, 20, 221, 4, 66, "Input",ExpressionUUID->"9530d886-b7fe-4d69-b13c-400b994b10e6"],
+Cell[CellGroupData[{
+Cell[804, 28, 221, 4, 58, "Subsection",ExpressionUUID->"0f376cff-f8ca-4f64-aa7d-05ec2f3e6d78"],
+Cell[1028, 34, 15167, 326, 2211, "Input",ExpressionUUID->"aebd874b-9881-4d52-9fc0-4d83dec5435f"],
+Cell[16198, 362, 1037, 25, 205, "Input",ExpressionUUID->"cd9c83f4-e85d-4308-b019-0be15e8992ea"],
+Cell[17238, 389, 4757, 107, 680, "Input",ExpressionUUID->"464bd444-70e3-406f-bf6d-8b2cb75ae35c"],
+Cell[21998, 498, 3260, 73, 561, "Input",ExpressionUUID->"22f91a96-9c98-4161-ba28-47147b554782"],
+Cell[25261, 573, 17698, 374, 3258, "Input",ExpressionUUID->"56a49fed-9fc8-4145-aaed-40c44bacf101"]
+}, Closed]],
+Cell[CellGroupData[{
+Cell[42996, 952, 207, 4, 40, "Subsection",ExpressionUUID->"677fe548-e8bd-4143-849d-b5800d49efc1"],
+Cell[43206, 958, 205, 4, 37, "Text",ExpressionUUID->"eb6ec43e-88f3-497e-aace-3ab0396b7d87"],
+Cell[43414, 964, 915, 26, 183, "Input",ExpressionUUID->"970d7474-d146-4927-98db-06e9bdf11012"],
+Cell[CellGroupData[{
+Cell[44354, 994, 1284, 38, 108, "Input",ExpressionUUID->"432f7106-7a36-4b45-ad7e-d214e8e816db"],
+Cell[45641, 1034, 261, 5, 35, "Output",ExpressionUUID->"f0f16367-9c4d-4f4f-99cf-8af3c9e66ee1"]
+}, Open  ]],
+Cell[45917, 1042, 206, 4, 37, "Text",ExpressionUUID->"8d5c8047-ea44-4b6a-bf81-e9e46e58ffef"],
+Cell[46126, 1048, 592, 17, 144, "Input",ExpressionUUID->"5ed55f61-c25d-419d-ac82-c07eebf651aa"],
+Cell[CellGroupData[{
+Cell[46743, 1069, 564, 16, 49, "Input",ExpressionUUID->"e4fc0314-7333-4097-af9b-a5649d7a4051"],
+Cell[47310, 1087, 205, 4, 35, "Output",ExpressionUUID->"252d4da2-4d97-499c-8c0a-33ca1ef28da8"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[47552, 1096, 516, 15, 66, "Input",ExpressionUUID->"0dbb5391-bf80-488d-b2c6-385a38edb700"],
+Cell[48071, 1113, 300, 7, 35, "Output",ExpressionUUID->"96cf2232-a118-48dc-95f2-8a311ee1a875"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[48408, 1125, 548, 14, 66, "Input",ExpressionUUID->"988ae5d7-52e4-486c-b089-fd19068db158"],
+Cell[48959, 1141, 497, 12, 45, "Message",ExpressionUUID->"07b997e9-bbe0-4bfc-9404-8a146ac087f8"],
+Cell[49459, 1155, 485, 12, 45, "Message",ExpressionUUID->"ee18a674-243d-4406-b614-86e86c6a1167"],
+Cell[49947, 1169, 308, 7, 35, "Output",ExpressionUUID->"1f13ff14-5771-4873-8d4f-2163bfaa03dc"]
+}, Open  ]],
+Cell[50270, 1179, 205, 4, 37, "Text",ExpressionUUID->"7a701cf0-4318-45d1-b63a-5b1ab025d016"],
+Cell[50478, 1185, 1177, 35, 222, "Input",ExpressionUUID->"f5eaf911-99c3-47ed-9992-e9209092f8d9"],
+Cell[CellGroupData[{
+Cell[51680, 1224, 1558, 46, 153, "Input",ExpressionUUID->"86c29eba-504a-459a-9c4a-c514e78738fd"],
+Cell[53241, 1272, 180, 3, 35, "Output",ExpressionUUID->"74911cc4-81f5-4231-bbe5-19f158c7ed7a"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[53458, 1280, 1193, 34, 110, "Input",ExpressionUUID->"ab881c41-3bb5-4e50-98f5-c70ce8487f94"],
+Cell[54654, 1316, 185, 3, 35, "Output",ExpressionUUID->"8c0dce51-4605-46bd-8f97-d0c96337924e"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[54876, 1324, 743, 20, 89, "Input",ExpressionUUID->"40076a75-ff67-466a-a314-60326c0741d8"],
+Cell[55622, 1346, 188, 3, 35, "Output",ExpressionUUID->"87bfdb4f-8c50-4c94-a746-d22cd02ecbb3"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[55847, 1354, 1667, 48, 153, "Input",ExpressionUUID->"c5f4ce57-b860-449f-923b-c93ac168893c"],
+Cell[57517, 1404, 258, 4, 35, "Output",ExpressionUUID->"61699acc-40f9-45fc-9824-ee5b6963e455"]
+}, Open  ]]
+}, Open  ]]
+}
+]
+*)
+
